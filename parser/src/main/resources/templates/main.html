@@ -8,8 +8,23 @@
 </head>
 <body>
     <div class=wrapper>
-        <input id="input"  type="text" />
-        <button id="button" onclick="sendString()">Send string</button>
+        <input id="stringInput"  type="text" placeholder="type your string"/>
+        <button id="parseButton" onclick="sendString()">Send string</button>
+    </div>
+    <div class=wrapper>
+        <input id="templateNameInput"  type="text" placeholder="type name of your template"/>
+        <input id="templateStringInput"  type="text" placeholder="type string of your template"/>
+        <button id="addButton" onclick="addTemplate()">Send add request</button>
+    </div>
+    <div class=wrapper>
+        <input id="updateIdInput" type="number" placeholder="type id of template">
+        <input id="updateNameInput"  type="text" placeholder="type new name"/>
+        <input id="updateStringInput"  type="text" placeholder="type new string"/>
+        <button id="updateButton" onclick="updateTemplate()">Send update request</button>
+    </div>
+    <div class=wrapper>
+        <input id="idInput"  type="text" placeholder="type template id"/>
+        <button id="deleteButton" onclick="deleteTemplate()">Send delete request</button>
     </div>
 </body>
 </html>
