@@ -10,8 +10,8 @@ public class Template {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String templateString;
     private String templateName;
+    private String templateString;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "template_id")
@@ -51,19 +51,19 @@ public class Template {
         this.id = id;
     }
 
-    public String getTemplateString() {
-        return templateString;
-    }
-
-    public void setTemplateString(String templateString) {
-        this.templateString = templateString;
-    }
-
     public String getTemplateName() {
         return templateName;
     }
 
     public void setTemplateName(String templateName) {
         this.templateName = templateName;
+    }
+
+    public String getTemplateString() {
+        return templateString;
+    }
+
+    public void setTemplateString(String templateString) {
+        this.templateString = templateString;
     }
 }

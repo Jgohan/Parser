@@ -6,10 +6,4 @@ public interface ParserService {
     Template identifyTemplate(String string);
 
     void parseString(String string);
-
-    void saveTemplate(Template template);
-
-    void saveUpdatingTemplate(Template template);
-
-    void deleteTemplate(Template template);
 }
