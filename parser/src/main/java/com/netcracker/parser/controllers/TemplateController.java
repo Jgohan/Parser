@@ -2,6 +2,9 @@ package com.netcracker.parser.controllers;
 
 import com.netcracker.parser.entities.Template;
 import com.netcracker.parser.services.implementations.TemplateServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/template")
 public class TemplateController {
     private final TemplateServiceImpl templateService;
+    private static final Logger logger = LoggerFactory.getLogger(TemplateController.class);
 
     public TemplateController(TemplateServiceImpl templateService) {
         this.templateService = templateService;
@@ -17,14 +21,12 @@ public class TemplateController {
 
     @GetMapping
     public Iterable<Template> getTemplates() {
-        System.out.println("LOAD");
-
         return templateService.getAllTemplates();
     }
 
     @PostMapping
     public void addTemplate(@RequestBody Template template) {
-        System.out.println("ADD " + template.getTemplateName() + ":  " +
+        logger.info("Adding Template: " + template.getTemplateName() + ":  " +
                 template.getTemplateString());
 
         templateService.saveTemplate(template);
@@ -32,7 +34,7 @@ public class TemplateController {
 
     @PutMapping
     public void updateTemplate(@RequestBody Template template) {
-        System.out.println("UPDATE " + template.getId() + "). " +
+        logger.info("Updating Template " + template.getId() + "). " +
                 template.getTemplateName() + ":  " + template.getTemplateString());
 
         templateService.saveUpdatingTemplate(template);
@@ -40,7 +42,7 @@ public class TemplateController {
 
     @DeleteMapping
     public void deleteTemplate(@RequestBody String id) {
-        System.out.println("DELETE template with id = " + id);
+        logger.info("Deleting template with id = " + id);
 
         templateService.deleteTemplate(Long.parseLong(id));
     }

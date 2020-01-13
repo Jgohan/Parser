@@ -16,17 +16,16 @@ public class ParserServiceImpl implements ParserService {
     private final MessageRepository messageRepository;
     private final AttributeRepository attributeRepository;
 
-    public ParserServiceImpl(
-            TemplateRepository templateRepository,
-            MessageRepository messageRepository,
-            AttributeRepository attributeRepository
-    ) {
+    public ParserServiceImpl(TemplateRepository templateRepository,
+                             MessageRepository messageRepository,
+                             AttributeRepository attributeRepository) {
         this.templateRepository = templateRepository;
         this.messageRepository = messageRepository;
         this.attributeRepository = attributeRepository;
     }
 
 
+    @Override
     public Template identifyTemplate(String string) {
         Iterable<Template> templates = templateRepository.findAll();
         int containedSubstringsNumber, attributesNumber;
@@ -57,6 +56,7 @@ public class ParserServiceImpl implements ParserService {
         throw new TemplateStringWasNotIdentifiedException();
     }
 
+    @Override
     public void parseString(String string) {
         Template template = identifyTemplate(string);
 
