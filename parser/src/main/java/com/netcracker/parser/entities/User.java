@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,9 +21,13 @@ public class User implements UserDetails {
     private String password;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "role", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> role;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private List<Message> messages;
 
     @Override
     public boolean isAccountNonExpired() {
@@ -50,7 +55,6 @@ public class User implements UserDetails {
                 .map(role -> new SimpleGrantedAuthority(role.getAuthority()))
                 .collect(Collectors.toList());
     }
-
 
 
     public User() {
@@ -87,5 +91,13 @@ public class User implements UserDetails {
 
     public void setRole(Set<Role> role) {
         this.role = role;
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
     }
 }

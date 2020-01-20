@@ -18,9 +18,18 @@ public class Message {
     @JoinColumn(name = "message_id")
     private List<Attribute> attributes;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User author;
+
 
     public Message() {
 
+    }
+
+    public Message(Template template, User author) {
+        this.template = template;
+        this.author = author;
     }
 
     public Message(Template template) {
@@ -49,5 +58,13 @@ public class Message {
 
     public void setAttributes(List<Attribute> attributes) {
         this.attributes = attributes;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
     }
 }

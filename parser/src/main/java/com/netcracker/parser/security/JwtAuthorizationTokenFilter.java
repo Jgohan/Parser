@@ -32,7 +32,6 @@ public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader(HEADER_STRING);
         if (token == null || !token.startsWith(TOKEN_PREFIX)) {
-            logger.info("Attempt authorization without valid token (" + token + ")");
             filterChain.doFilter(request, response);
             return;
         }
@@ -43,16 +42,15 @@ public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
                     .verify(token.replace(TOKEN_PREFIX, ""))
                     .getSubject();
 
-
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities()
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            logger.info("Authorization with token " + token);
-        } catch(TokenExpiredException e) {
-            logger.error("Authorization with expired token " + token);
+            logger.info("Authorization with token:\n" + token);
+        } catch (TokenExpiredException e) {
+            logger.info("Authorization with expired token:\n" + token);
         }
         filterChain.doFilter(request, response);
     }

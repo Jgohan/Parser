@@ -1,49 +1,51 @@
 package com.netcracker.parser.controllers;
 
 import com.netcracker.parser.entities.Template;
-import com.netcracker.parser.services.implementations.TemplateServiceImpl;
+import com.netcracker.parser.services.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:8080")
 @RequestMapping("/template")
 public class TemplateController {
-    private final TemplateServiceImpl templateService;
+    private final TemplateService templateService;
     private static final Logger logger = LoggerFactory.getLogger(TemplateController.class);
 
-    public TemplateController(TemplateServiceImpl templateService) {
+    public TemplateController(TemplateService templateService) {
         this.templateService = templateService;
     }
 
 
     @GetMapping
     public Iterable<Template> getTemplates() {
+        logger.info("Returning Template list");
+
         return templateService.getAllTemplates();
     }
 
     @PostMapping
-    public void addTemplate(@RequestBody Template template) {
-        logger.info("Adding Template: " + template.getTemplateName() + ":  " +
+    public ResponseEntity<?> addTemplate(@RequestBody Template template) {
+        logger.info("Adding Template:\n" + template.getTemplateName() + " - " +
                 template.getTemplateString());
 
-        templateService.saveTemplate(template);
+        return templateService.saveTemplate(template);
     }
 
     @PutMapping
-    public void updateTemplate(@RequestBody Template template) {
-        logger.info("Updating Template " + template.getId() + "). " +
-                template.getTemplateName() + ":  " + template.getTemplateString());
+    public ResponseEntity<?> updateTemplate(@RequestBody Template template) {
+        logger.info("Updating Template with id " + template.getId() + ":\n" +
+                template.getTemplateName() + " - " + template.getTemplateString());
 
-        templateService.saveUpdatingTemplate(template);
+        return templateService.saveUpdatingTemplate(template);
     }
 
     @DeleteMapping
-    public void deleteTemplate(@RequestBody String id) {
-        logger.info("Deleting template with id = " + id);
+    public ResponseEntity<?> deleteTemplate(@RequestBody String id) {
+        logger.info("Deleting template with id " + id);
 
-        templateService.deleteTemplate(Long.parseLong(id));
+        return templateService.deleteTemplate(Long.parseLong(id));
     }
 }
