@@ -1,13 +1,14 @@
 package com.netcracker.parser.services;
 
 import com.netcracker.parser.entities.Template;
+import org.springframework.http.ResponseEntity;
 
 public interface TemplateService {
     Iterable<Template> getAllTemplates();
 
-    void saveTemplate(Template template);
+    ResponseEntity<?> saveTemplate(Template template);
 
-    void saveUpdatingTemplate(Template template);
+    ResponseEntity<?> saveUpdatingTemplate(Template template);
 
-    void deleteTemplate(Long id);
+    ResponseEntity<?> deleteTemplate(Long id);
 }

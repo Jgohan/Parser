@@ -3,12 +3,18 @@ package com.netcracker.parser.services.implementations;
 import com.netcracker.parser.entities.Attribute;
 import com.netcracker.parser.entities.Message;
 import com.netcracker.parser.entities.Template;
+import com.netcracker.parser.entities.User;
 import com.netcracker.parser.exceptions.TemplateStringWasNotIdentifiedException;
 import com.netcracker.parser.repositories.AttributeRepository;
 import com.netcracker.parser.repositories.MessageRepository;
 import com.netcracker.parser.repositories.TemplateRepository;
+import com.netcracker.parser.security.Response;
 import com.netcracker.parser.services.ParserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import static com.netcracker.parser.services.Constants.att;
 
 @Service
 public class ParserServiceImpl implements ParserService {
@@ -16,23 +22,22 @@ public class ParserServiceImpl implements ParserService {
     private final MessageRepository messageRepository;
     private final AttributeRepository attributeRepository;
 
-    public ParserServiceImpl(
-            TemplateRepository templateRepository,
-            MessageRepository messageRepository,
-            AttributeRepository attributeRepository
-    ) {
+    public ParserServiceImpl(TemplateRepository templateRepository,
+                             MessageRepository messageRepository,
+                             AttributeRepository attributeRepository) {
         this.templateRepository = templateRepository;
         this.messageRepository = messageRepository;
         this.attributeRepository = attributeRepository;
     }
 
 
+    @Override
     public Template identifyTemplate(String string) {
         Iterable<Template> templates = templateRepository.findAll();
         int containedSubstringsNumber, attributesNumber;
 
         for (Template template : templates) {
-            String[] templateSubstrings = template.getTemplateString().split("_att_");
+            String[] templateSubstrings = template.getTemplateString().split(att);
 
             containedSubstringsNumber = 0;
             String stringBuffer = string;
@@ -47,42 +52,51 @@ public class ParserServiceImpl implements ParserService {
 
             attributesNumber = stringBuffer.trim().split(" ").length;
 
-            if (
-                    attributesNumber == template.countAttributes()
+            if (attributesNumber == template.countAttributes()
                     && containedSubstringsNumber == templateSubstrings.length
-                    && string.split(" ").length == template.getTemplateString().split(" ").length
-            ) return template;
+                    && string.split(" ").length == template.getTemplateString().split(" ").length)
+                return template;
         }
 
         throw new TemplateStringWasNotIdentifiedException();
     }
 
-    public void parseString(String string) {
-        Template template = identifyTemplate(string);
+    @Override
+    public ResponseEntity<?> parseString(String string, User author) {
+        try {
+            Template template = identifyTemplate(string);
+            Message message = new Message(template, author);
 
-        Message message = new Message();
-        message.setTemplate(template);
-
-        Attribute[] attributes = new Attribute[template.countAttributes()];
-        for (int i = 0; i < attributes.length; i++) {
-            attributes[i] = new Attribute(i + 1, message);
-        }
-
-        String[] substrings = string.split(" ");
-        String[] templateSubstrings = template.getTemplateString().split(" ");
-        int position = 0;
-
-        for (int i = 0; i < substrings.length; i++) {
-            if (!substrings[i].equals((templateSubstrings[i]))) {
-                attributes[position].setValue(substrings[i]);
-                position++;
+            Attribute[] attributes = new Attribute[template.countAttributes()];
+            for (int i = 0; i < attributes.length; i++) {
+                attributes[i] = new Attribute(i + 1, message);
             }
-        }
 
-        messageRepository.save(message);
+            String[] substrings = string.split(" ");
+            String[] templateSubstrings = template.getTemplateString().split(" ");
+            int position = 0;
 
-        for (Attribute attribute : attributes) {
-            attributeRepository.save(attribute);
+            for (int i = 0; i < substrings.length; i++) {
+                if (!substrings[i].equals((templateSubstrings[i]))) {
+                    attributes[position].setValue(substrings[i]);
+                    position++;
+                }
+            }
+
+            messageRepository.save(message);
+
+            for (Attribute attribute : attributes) {
+                attributeRepository.save(attribute);
+            }
+
+            return ResponseEntity.ok(
+                    new Response("String has been parsed")
+            );
+        } catch (TemplateStringWasNotIdentifiedException e) {
+            return new ResponseEntity<>(
+                    new Response(e.getMessage()),
+                    HttpStatus.BAD_REQUEST
+            );
         }
     }
 }
