@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import static com.netcracker.parser.services.Constants.att;
+import static com.netcracker.parser.services.Constants.ATTRIBUTE;
 
 @Service
 public class TemplateServiceImpl implements TemplateService {
@@ -32,7 +32,7 @@ public class TemplateServiceImpl implements TemplateService {
         if (template.getTemplateName().isEmpty()) return true;
 
         String templateString = template.getTemplateString();
-        String[] substrings = templateString.split(att, -1);
+        String[] substrings = templateString.split(ATTRIBUTE, -1);
 
         if (template.countAttributes() == 0) return true;
         if (substrings.length > 1) {
@@ -41,7 +41,7 @@ public class TemplateServiceImpl implements TemplateService {
                     return true;
             }
         }
-        if (!templateString.endsWith(att) && !substrings[substrings.length - 1].startsWith(" "))
+        if (!templateString.endsWith(ATTRIBUTE) && !substrings[substrings.length - 1].startsWith(" "))
             return true;
 
         return false;

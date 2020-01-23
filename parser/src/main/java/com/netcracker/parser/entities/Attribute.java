@@ -1,5 +1,7 @@
 package com.netcracker.parser.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -12,6 +14,7 @@ public class Attribute {
     private String value;
     private Integer position;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "message_id")
     private Message message;

@@ -1,5 +1,5 @@
 package com.netcracker.parser.services;
 
 public interface Constants {
-    String att = "_att_";
+    String ATTRIBUTE = "_att_";
 }

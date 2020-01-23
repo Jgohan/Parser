@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.util.List;
 
-import static com.netcracker.parser.services.Constants.att;
+import static com.netcracker.parser.services.Constants.ATTRIBUTE;
 
 @Entity
 @Table(name = "templates")
@@ -23,7 +23,7 @@ public class Template {
     private List<Message> messages;
 
     public int countAttributes() {
-        return templateString.split(att, -1).length - 1;
+        return templateString.split(ATTRIBUTE, -1).length - 1;
     }
 
 
