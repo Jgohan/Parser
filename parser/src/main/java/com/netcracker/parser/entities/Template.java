@@ -22,6 +22,10 @@ public class Template {
     @JoinColumn(name = "template_id")
     private List<Message> messages;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "template_id")
+    private List<AttributeName> attributesNames;
+
     public int countAttributes() {
         return templateString.split(ATTRIBUTE, -1).length - 1;
     }
@@ -29,10 +33,6 @@ public class Template {
 
     public Template() {
 
-    }
-
-    public Template(String templateString) {
-        this.templateString = templateString;
     }
 
     public Long getId() {
@@ -65,5 +65,13 @@ public class Template {
 
     public void setMessages(List<Message> messages) {
         this.messages = messages;
+    }
+
+    public List<AttributeName> getAttributesNames() {
+        return attributesNames;
+    }
+
+    public void setAttributesNames(List<AttributeName> attributesNames) {
+        this.attributesNames = attributesNames;
     }
 }
