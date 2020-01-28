@@ -4,7 +4,9 @@ import com.netcracker.parser.entities.Attribute;
 import com.netcracker.parser.entities.Message;
 import com.netcracker.parser.entities.Template;
 import com.netcracker.parser.entities.User;
+import com.netcracker.parser.exceptions.StringContainsCodeCharSequenceException;
 import com.netcracker.parser.exceptions.TemplateStringWasNotIdentifiedException;
+import com.netcracker.parser.exceptions.TemplateWithThisIdDoesNotExistException;
 import com.netcracker.parser.repositories.AttributeRepository;
 import com.netcracker.parser.repositories.MessageRepository;
 import com.netcracker.parser.repositories.TemplateRepository;
@@ -14,7 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import static com.netcracker.parser.services.Constants.att;
+import java.time.*;
+import java.util.List;
+
+import static com.netcracker.parser.services.Constants.ATTRIBUTE;
 
 @Service
 public class ParserServiceImpl implements ParserService {
@@ -31,13 +36,12 @@ public class ParserServiceImpl implements ParserService {
     }
 
 
-    @Override
-    public Template identifyTemplate(String string) {
+    private Template identifyTemplate(String string) {
         Iterable<Template> templates = templateRepository.findAll();
         int containedSubstringsNumber, attributesNumber;
 
         for (Template template : templates) {
-            String[] templateSubstrings = template.getTemplateString().split(att);
+            String[] templateSubstrings = template.getTemplateString().split(ATTRIBUTE);
 
             containedSubstringsNumber = 0;
             String stringBuffer = string;
@@ -64,8 +68,13 @@ public class ParserServiceImpl implements ParserService {
     @Override
     public ResponseEntity<?> parseString(String string, User author) {
         try {
+            if (string.contains(ATTRIBUTE)) throw new StringContainsCodeCharSequenceException();
             Template template = identifyTemplate(string);
-            Message message = new Message(template, author);
+            Message message = new Message(
+                    template,
+                    author,
+                    ZonedDateTime.now(ZoneId.of("UTC")).withNano(0)
+            );
 
             Attribute[] attributes = new Attribute[template.countAttributes()];
             for (int i = 0; i < attributes.length; i++) {
@@ -92,11 +101,19 @@ public class ParserServiceImpl implements ParserService {
             return ResponseEntity.ok(
                     new Response("String has been parsed")
             );
-        } catch (TemplateStringWasNotIdentifiedException e) {
+        } catch (TemplateStringWasNotIdentifiedException
+                | StringContainsCodeCharSequenceException e) {
             return new ResponseEntity<>(
                     new Response(e.getMessage()),
                     HttpStatus.BAD_REQUEST
             );
         }
+    }
+
+    @Override
+    public List<Message> getMessages(Long templateId) {
+        Template template = templateRepository.findById(templateId)
+                .orElseThrow(TemplateWithThisIdDoesNotExistException::new);
+        return template.getMessages();
     }
 }

@@ -1,6 +1,9 @@
 package com.netcracker.parser.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Entity
@@ -10,6 +13,7 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "template_id")
     private Template template;
@@ -22,14 +26,17 @@ public class Message {
     @JoinColumn(name = "user_id")
     private User author;
 
+    private ZonedDateTime creationTime;
+
 
     public Message() {
 
     }
 
-    public Message(Template template, User author) {
+    public Message(Template template, User author, ZonedDateTime creationTime) {
         this.template = template;
         this.author = author;
+        this.creationTime = creationTime;
     }
 
     public Message(Template template) {
@@ -66,5 +73,13 @@ public class Message {
 
     public void setAuthor(User author) {
         this.author = author;
+    }
+
+    public ZonedDateTime getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(ZonedDateTime creationTime) {
+        this.creationTime = creationTime;
     }
 }
