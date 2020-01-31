@@ -12,7 +12,11 @@ public class Attribute {
     private Long id;
 
     private String value;
-    private Integer position;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "attributes_names_id")
+    private AttributeName name;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
@@ -24,8 +28,8 @@ public class Attribute {
 
     }
 
-    public Attribute(Integer position, Message message) {
-        this.position = position;
+    public Attribute(AttributeName name, Message message) {
+        this.name = name;
         this.message = message;
     }
 
@@ -45,12 +49,12 @@ public class Attribute {
         this.value = value;
     }
 
-    public Integer getPosition() {
-        return position;
+    public AttributeName getName() {
+        return name;
     }
 
-    public void setPosition(Integer position) {
-        this.position = position;
+    public void setName(AttributeName name) {
+        this.name = name;
     }
 
     public Message getMessage() {
@@ -60,5 +64,4 @@ public class Attribute {
     public void setMessage(Message message) {
         this.message = message;
     }
-
 }

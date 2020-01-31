@@ -63,6 +63,10 @@ public class TemplateServiceImpl implements TemplateService {
             if (isTemplateInvalid(template)) throw new TemplateIsNotValidException();
             if (templateRepository.existsByTemplateString(template.getTemplateString()))
                 throw new TemplateWithThisTemplateStringAlreadyExistsException();
+            List<AttributeName> attributeNames = template.getAttributesNames();
+            for (int i = 0; i < attributeNames.size(); i++) {
+                attributeNames.get(i).setPosition(i);
+            }
             templateRepository.save(template);
             return ResponseEntity.ok(
                     new Response("Template has been added")

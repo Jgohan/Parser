@@ -1,10 +1,6 @@
 package com.netcracker.parser.services.implementations;
 
-import com.netcracker.parser.entities.Attribute;
-import com.netcracker.parser.entities.Message;
-import com.netcracker.parser.entities.Template;
-import com.netcracker.parser.entities.User;
-import com.netcracker.parser.exceptions.StringContainsCodeCharSequenceException;
+import com.netcracker.parser.entities.*;
 import com.netcracker.parser.exceptions.TemplateStringWasNotIdentifiedException;
 import com.netcracker.parser.exceptions.TemplateWithThisIdDoesNotExistException;
 import com.netcracker.parser.repositories.AttributeRepository;
@@ -16,7 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.*;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static com.netcracker.parser.services.Constants.ATTRIBUTE;
@@ -68,7 +65,6 @@ public class ParserServiceImpl implements ParserService {
     @Override
     public ResponseEntity<?> parseString(String string, User author) {
         try {
-            if (string.contains(ATTRIBUTE)) throw new StringContainsCodeCharSequenceException();
             Template template = identifyTemplate(string);
             Message message = new Message(
                     template,
@@ -76,9 +72,13 @@ public class ParserServiceImpl implements ParserService {
                     ZonedDateTime.now(ZoneId.of("UTC")).withNano(0)
             );
 
+            List<AttributeName> attributeNames = template.getAttributesNames();
             Attribute[] attributes = new Attribute[template.countAttributes()];
             for (int i = 0; i < attributes.length; i++) {
-                attributes[i] = new Attribute(i + 1, message);
+                attributes[i] = new Attribute(
+                        attributeNames.get(i),
+                        message
+                );
             }
 
             String[] substrings = string.split(" ");
@@ -86,7 +86,7 @@ public class ParserServiceImpl implements ParserService {
             int position = 0;
 
             for (int i = 0; i < substrings.length; i++) {
-                if (!substrings[i].equals((templateSubstrings[i]))) {
+                if (templateSubstrings[i].equals(ATTRIBUTE)) {
                     attributes[position].setValue(substrings[i]);
                     position++;
                 }
@@ -101,8 +101,7 @@ public class ParserServiceImpl implements ParserService {
             return ResponseEntity.ok(
                     new Response("String has been parsed")
             );
-        } catch (TemplateStringWasNotIdentifiedException
-                | StringContainsCodeCharSequenceException e) {
+        } catch (TemplateStringWasNotIdentifiedException e) {
             return new ResponseEntity<>(
                     new Response(e.getMessage()),
                     HttpStatus.BAD_REQUEST

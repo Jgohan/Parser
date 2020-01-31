@@ -24,7 +24,10 @@ public class ParserController {
 
 
     @PostMapping
-    public ResponseEntity<?> parseString(@RequestBody String string, @AuthenticationPrincipal User author) {
+    public ResponseEntity<?> parseString(
+            @RequestBody String string,
+            @AuthenticationPrincipal User author
+    ) {
         logger.info("Parsing string: " + string);
 
         return parserService.parseString(string.trim(), author);
