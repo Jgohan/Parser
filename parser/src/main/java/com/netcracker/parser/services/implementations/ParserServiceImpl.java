@@ -6,7 +6,6 @@ import com.netcracker.parser.exceptions.TemplateWithThisIdDoesNotExistException;
 import com.netcracker.parser.repositories.AttributeRepository;
 import com.netcracker.parser.repositories.MessageRepository;
 import com.netcracker.parser.repositories.TemplateRepository;
-import com.netcracker.parser.security.Response;
 import com.netcracker.parser.services.ParserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -98,12 +97,10 @@ public class ParserServiceImpl implements ParserService {
                 attributeRepository.save(attribute);
             }
 
-            return ResponseEntity.ok(
-                    new Response("String has been parsed")
-            );
+            return ResponseEntity.ok("String has been parsed");
         } catch (TemplateStringWasNotIdentifiedException e) {
             return new ResponseEntity<>(
-                    new Response(e.getMessage()),
+                    e.getMessage(),
                     HttpStatus.BAD_REQUEST
             );
         }

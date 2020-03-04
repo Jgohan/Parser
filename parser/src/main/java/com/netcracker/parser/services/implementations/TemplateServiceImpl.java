@@ -5,7 +5,6 @@ import com.netcracker.parser.entities.Template;
 import com.netcracker.parser.exceptions.*;
 import com.netcracker.parser.repositories.AttributeNameRepository;
 import com.netcracker.parser.repositories.TemplateRepository;
-import com.netcracker.parser.security.Response;
 import com.netcracker.parser.services.TemplateService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,12 +67,10 @@ public class TemplateServiceImpl implements TemplateService {
                 attributeNames.get(i).setPosition(i);
             }
             templateRepository.save(template);
-            return ResponseEntity.ok(
-                    new Response("Template has been added")
-            );
+            return ResponseEntity.ok("Template has been added");
         } catch (TemplateIsNotValidException | TemplateWithThisTemplateStringAlreadyExistsException e) {
             return new ResponseEntity<>(
-                    new Response(e.getMessage()),
+                    e.getMessage(),
                     HttpStatus.BAD_REQUEST
             );
         }
@@ -104,15 +101,13 @@ public class TemplateServiceImpl implements TemplateService {
                 }
 
                 templateRepository.save(updatingTemplate);
-                return ResponseEntity.ok(
-                        new Response("Template has been updated")
-                );
+                return ResponseEntity.ok("Template has been updated");
             }
         } catch (TemplateWithThisIdDoesNotExistException
                 | TemplateIsNotValidException
                 | TemplateStringWasNotIdentifiedException e) {
             return new ResponseEntity<>(
-                    new Response(e.getMessage()),
+                   e.getMessage(),
                     HttpStatus.BAD_REQUEST
             );
         }
@@ -124,12 +119,10 @@ public class TemplateServiceImpl implements TemplateService {
             Template deletingTemplate = templateRepository.findById(id)
                     .orElseThrow(TemplateWithThisIdDoesNotExistException::new);
             templateRepository.delete(deletingTemplate);
-            return ResponseEntity.ok(
-                    new Response("Template has been deleted")
-            );
+            return ResponseEntity.ok("Template has been deleted");
         } catch (TemplateWithThisIdDoesNotExistException e) {
             return new ResponseEntity<>(
-                    new Response(e.getMessage()),
+                    e.getMessage(),
                     HttpStatus.BAD_REQUEST
             );
         }
