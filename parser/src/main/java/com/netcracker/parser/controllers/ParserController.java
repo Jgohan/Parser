@@ -25,7 +25,7 @@ public class ParserController {
 
     @PostMapping
     public ResponseEntity<?> parseString(@RequestBody String string, @AuthenticationPrincipal User author) {
-        logger.info("Parsing string: " + string);
+        logger.info("Parsing string: {}", string);
 
         return parserService.parseString(string.trim(), author);
     }
@@ -34,7 +34,7 @@ public class ParserController {
     public List<Message> getStrings(
             @RequestParam(name = "templateId") String templateId
     ) {
-        logger.info("Get strings for template with id " + templateId);
+        logger.info("Get strings for template with id {}", templateId);
 
         return parserService.getMessages(Long.parseLong(templateId));
     }
