@@ -29,7 +29,7 @@ public class ParserController {
             @AuthenticationPrincipal User author
     ) {
         string = string.replaceAll("[\r\n]","");
-        logger.info("Parsing string: {}", string);
+        logger.info("Parsing string: {}", string.replaceAll("[\r\n]",""));
 
         return parserService.parseString(string.trim(), author);
     }
@@ -38,8 +38,10 @@ public class ParserController {
     public List<Message> getStrings(
             @RequestParam(name = "templateId") String templateId
     ) {
-        templateId = templateId.replaceAll("[\r\n]","");
-        logger.info("Get strings for template with id {}", templateId);
+        logger.info(
+                "Get strings for template with id {}",
+                templateId.replaceAll("[\r\n]","")
+        );
 
         return parserService.getMessages(Long.parseLong(templateId));
     }
