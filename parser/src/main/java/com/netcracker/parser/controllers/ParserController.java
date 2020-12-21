@@ -24,7 +24,11 @@ public class ParserController {
 
 
     @PostMapping
-    public ResponseEntity<?> parseString(@RequestBody String string, @AuthenticationPrincipal User author) {
+    public ResponseEntity<?> parseString(
+            @RequestBody String string,
+            @AuthenticationPrincipal User author
+    ) {
+        string = string.replaceAll("[\r\n]","");
         logger.info("Parsing string: {}", string);
 
         return parserService.parseString(string.trim(), author);
@@ -34,6 +38,7 @@ public class ParserController {
     public List<Message> getStrings(
             @RequestParam(name = "templateId") String templateId
     ) {
+        templateId = templateId.replaceAll("[\r\n]","");
         logger.info("Get strings for template with id {}", templateId);
 
         return parserService.getMessages(Long.parseLong(templateId));
