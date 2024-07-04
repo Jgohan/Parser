@@ -1,9 +1,10 @@
 target/
 !**/src/main/**
 !**/src/test/**
+.mvn/
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
