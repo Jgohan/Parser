@@ -4,8 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.netcracker.parser.services.implementations.UserDetailsServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,11 +19,12 @@ import java.io.IOException;
 
 import static com.netcracker.parser.security.SecurityConstants.*;
 
+@Log4j2
 public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
+
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthorizationTokenFilter.class);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -48,10 +48,12 @@ public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            logger.info("Authorization with token:\n" + token);
+
+            log.info("Authorization with token: {}", token);
         } catch (TokenExpiredException e) {
-            logger.info("Authorization with expired token:\n" + token);
+            log.info("Authorization with expired token: {}", token);
         }
+
         filterChain.doFilter(request, response);
     }
 }

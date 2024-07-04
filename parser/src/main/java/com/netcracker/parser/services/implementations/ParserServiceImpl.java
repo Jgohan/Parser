@@ -12,6 +12,7 @@ import com.netcracker.parser.repositories.MessageRepository;
 import com.netcracker.parser.repositories.TemplateRepository;
 import com.netcracker.parser.security.Response;
 import com.netcracker.parser.services.ParserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,67 +23,35 @@ import java.util.List;
 import static com.netcracker.parser.services.Constants.ATTRIBUTE;
 
 @Service
+@RequiredArgsConstructor
 public class ParserServiceImpl implements ParserService {
+
     private final TemplateRepository templateRepository;
     private final MessageRepository messageRepository;
     private final AttributeRepository attributeRepository;
 
-    public ParserServiceImpl(TemplateRepository templateRepository,
-                             MessageRepository messageRepository,
-                             AttributeRepository attributeRepository) {
-        this.templateRepository = templateRepository;
-        this.messageRepository = messageRepository;
-        this.attributeRepository = attributeRepository;
-    }
-
-
-    private Template identifyTemplate(String string) {
-        Iterable<Template> templates = templateRepository.findAll();
-        int containedSubstringsNumber, attributesNumber;
-
-        for (Template template : templates) {
-            String[] templateSubstrings = template.getTemplateString().split(ATTRIBUTE);
-
-            containedSubstringsNumber = 0;
-            String stringBuffer = string;
-            for (String substring : templateSubstrings) {
-                if (stringBuffer.contains(substring)) {
-                    containedSubstringsNumber++;
-
-                    if (!substring.isEmpty())
-                        stringBuffer = stringBuffer.replaceFirst(substring, " ");
-                }
-            }
-
-            attributesNumber = stringBuffer.trim().split(" ").length;
-
-            if (attributesNumber == template.countAttributes()
-                    && containedSubstringsNumber == templateSubstrings.length
-                    && string.split(" ").length == template.getTemplateString().split(" ").length)
-                return template;
-        }
-
-        throw new TemplateStringWasNotIdentifiedException();
-    }
 
     @Override
     public ResponseEntity<?> parseString(String string, User author) {
         try {
-            if (string.contains(ATTRIBUTE)) throw new StringContainsCodeCharSequenceException();
-            Template template = identifyTemplate(string);
-            Message message = new Message(
+            if (string.contains(ATTRIBUTE)) {
+                throw new StringContainsCodeCharSequenceException();
+            }
+
+            var template = identifyTemplate(string);
+            var message = new Message(
                     template,
                     author,
                     ZonedDateTime.now(ZoneId.of("UTC")).withNano(0)
             );
 
-            Attribute[] attributes = new Attribute[template.countAttributes()];
+            var attributes = new Attribute[template.countAttributes()];
             for (int i = 0; i < attributes.length; i++) {
                 attributes[i] = new Attribute(i + 1, message);
             }
 
-            String[] substrings = string.split(" ");
-            String[] templateSubstrings = template.getTemplateString().split(" ");
+            var substrings = string.split(" ");
+            var templateSubstrings = template.getTemplateString().split(" ");
             int position = 0;
 
             for (int i = 0; i < substrings.length; i++) {
@@ -94,7 +63,7 @@ public class ParserServiceImpl implements ParserService {
 
             messageRepository.save(message);
 
-            for (Attribute attribute : attributes) {
+            for (var attribute : attributes) {
                 attributeRepository.save(attribute);
             }
 
@@ -112,8 +81,40 @@ public class ParserServiceImpl implements ParserService {
 
     @Override
     public List<Message> getMessages(Long templateId) {
-        Template template = templateRepository.findById(templateId)
+        var template = templateRepository
+                .findById(templateId)
                 .orElseThrow(TemplateWithThisIdDoesNotExistException::new);
+
         return template.getMessages();
+    }
+
+    private Template identifyTemplate(String string) {
+        var templates = templateRepository.findAll();
+        int containedSubstringsNumber, attributesNumber;
+
+        for (var template : templates) {
+            var templateSubstrings = template.getTemplateString().split(ATTRIBUTE);
+            containedSubstringsNumber = 0;
+            var stringBuffer = string;
+
+            for (var substring : templateSubstrings) {
+                if (stringBuffer.contains(substring)) {
+                    containedSubstringsNumber++;
+
+                    if (!substring.isEmpty()) {
+                        stringBuffer = stringBuffer.replaceFirst(substring, " ");
+                    }
+                }
+            }
+
+            attributesNumber = stringBuffer.trim().split(" ").length;
+
+            if (attributesNumber == template.countAttributes()
+                    && containedSubstringsNumber == templateSubstrings.length
+                    && string.split(" ").length == template.getTemplateString().split(" ").length)
+                return template;
+        }
+
+        throw new TemplateStringWasNotIdentifiedException();
     }
 }

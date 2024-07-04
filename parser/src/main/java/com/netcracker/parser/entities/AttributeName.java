@@ -1,11 +1,17 @@
 package com.netcracker.parser.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "attributes_names")
+@Setter
+@Getter
+@NoArgsConstructor
 public class AttributeName {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -17,37 +23,4 @@ public class AttributeName {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "template_id")
     private Template template;
-
-
-    public AttributeName() {
-
-    }
-
-    public AttributeName(String name) {
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Template getTemplate() {
-        return template;
-    }
-
-    public void setTemplate(Template template) {
-        this.template = template;
-    }
 }

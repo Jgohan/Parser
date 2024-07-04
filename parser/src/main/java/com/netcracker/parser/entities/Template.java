@@ -1,6 +1,9 @@
 package com.netcracker.parser.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
@@ -9,7 +12,11 @@ import static com.netcracker.parser.services.Constants.ATTRIBUTE;
 
 @Entity
 @Table(name = "templates")
+@Setter
+@Getter
+@NoArgsConstructor
 public class Template {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -28,50 +35,5 @@ public class Template {
 
     public int countAttributes() {
         return templateString.split(ATTRIBUTE, -1).length - 1;
-    }
-
-
-    public Template() {
-
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTemplateName() {
-        return templateName;
-    }
-
-    public void setTemplateName(String templateName) {
-        this.templateName = templateName;
-    }
-
-    public String getTemplateString() {
-        return templateString;
-    }
-
-    public void setTemplateString(String templateString) {
-        this.templateString = templateString;
-    }
-
-    public List<Message> getMessages() {
-        return messages;
-    }
-
-    public void setMessages(List<Message> messages) {
-        this.messages = messages;
-    }
-
-    public List<AttributeName> getAttributesNames() {
-        return attributesNames;
-    }
-
-    public void setAttributesNames(List<AttributeName> attributesNames) {
-        this.attributesNames = attributesNames;
     }
 }

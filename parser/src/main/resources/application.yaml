@@ -1,0 +1,12 @@
+server:
+  port: 8081
+
+spring:
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/parserdb}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:1234}
